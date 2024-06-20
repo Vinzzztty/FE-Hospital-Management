@@ -264,138 +264,60 @@
                         <!-- / Content -->
 
                         <!-- Modal Reject -->
-                        <div
-                            class="modal fade"
-                            id="rejectModal"
-                            tabindex="-1"
-                            aria-hidden="true"
-                        >
-                            <div
-                                class="modal-dialog modal-dialog-centered"
-                                role="document"
-                            >
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5
-                                            class="modal-title"
-                                            id="exampleModalLabel1"
-                                        >
-                                            Alasan Ditolak
-                                        </h5>
-                                        <button
-                                            type="button"
-                                            class="btn-close"
-                                            data-bs-dismiss="modal"
-                                            aria-label="Close"
-                                        ></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col mb-3">
-                                                <label
-                                                    for="nameBasic"
-                                                    class="form-label"
-                                                    >Alasan</label
-                                                >
-                                                <input
-                                                    type="text"
-                                                    id="nameBasic"
-                                                    class="form-control"
-                                                    placeholder=""
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-secondary"
-                                            style="outline: #9cbee4"
-                                            data-bs-dismiss="modal"
-                                        >
-                                            Close
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            style="
-                                                background-color: #9cbee4;
-                                                color: white;
-                                            "
-                                        >
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Modal Reject-->
-                        <!-- Modal Reject -->
-                        <div
-                            class="modal fade"
-                            id="accModal"
-                            tabindex="-1"
-                            aria-hidden="true"
-                        >
-                            <div
-                                class="modal-dialog modal-dialog-centered"
-                                role="document"
-                            >
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5
-                                            class="modal-title"
-                                            id="exampleModalLabel1"
-                                        >
-                                            Jumlah Diterima
-                                        </h5>
-                                        <button
-                                            type="button"
-                                            class="btn-close"
-                                            data-bs-dismiss="modal"
-                                            aria-label="Close"
-                                        ></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col mb-3">
-                                                <label
-                                                    for="nameBasic"
-                                                    class="form-label"
-                                                    >Jumlah
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    id="nameBasic"
-                                                    class="form-control"
-                                                    placeholder=""
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-secondary"
-                                            style="outline: #9cbee4"
-                                            data-bs-dismiss="modal"
-                                        >
-                                            Close
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="btn"
-                                            style="
-                                                background-color: #9cbee4;
-                                                color: white;
-                                            "
-                                        >
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                         <!-- Modal Reject-->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel1">Alasan Ditolak</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="rejectForm">
+            <input type="hidden" id="reject-id" name="id_ajukan" value="">
+            <div class="row">
+              <div class="col mb-3">
+                <label for="reject-reason" class="form-label">Alasan</label>
+                <input type="text" id="reject-reason" class="form-control" name="reason" placeholder="">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" style="outline: #9cbee4" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn" style="background-color: #9cbee4; color: white;" onclick="submitRejectForm()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal Accept-->
+  <div class="modal fade" id="accModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel1">Jumlah Diterima</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="acceptForm">
+            <input type="hidden" id="accept-id" name="id_ajukan" value="">
+            <div class="row">
+              <div class="col mb-3">
+                <label for="accept-amount" class="form-label">Jumlah</label>
+                <input type="text" id="accept-amount" class="form-control" name="jumlah_diterima" placeholder="">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" style="outline: #9cbee4" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn" style="background-color: #9cbee4; color: white;" onclick="submitAcceptForm()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
                         <!-- Modal Reject-->
                         <!-- Footer -->
                         <footer class="content-footer footer bg-footer-theme">
@@ -449,6 +371,77 @@
         <!-- Place this tag in your head or just before your close body tag. -->
         <script async defer src="https://buttons.github.io/buttons.js"></script>
         <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+        <script>
+            // Set the ID in the modal when the button is clicked
+            $('#rejectModal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget) // Button that triggered the modal
+              var id = button.data('id') // Extract info from data-* attributes
+              var modal = $(this)
+              modal.find('.modal-body #reject-id').val(id)
+            })
+          
+            $('#accModal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget) // Button that triggered the modal
+              var id = button.data('id') // Extract info from data-* attributes
+              var modal = $(this)
+              modal.find('.modal-body #accept-id').val(id)
+            })
+          
+            // Submit reject form
+            function submitRejectForm() {
+              var form = $('#rejectForm')
+              var id = form.find('#reject-id').val()
+              var reason = form.find('#reject-reason').val()
+          
+              $.ajax({
+                url: 'http://127.0.0.1:1330/sub_bagian/verifikasi',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  id_ajukan: id,
+                  reason: reason
+                }),
+                success: function(response) {
+                  // Handle success
+                  $('#rejectModal').modal('hide')
+                  location.reload()
+                },
+                error: function(response) {
+                  // Handle error
+                  alert('An error occurred')
+                }
+              })
+            }
+          
+            // Submit accept form
+            function submitAcceptForm() {
+              var form = $('#acceptForm')
+              var id = form.find('#accept-id').val()
+              var jumlah_diterima = form.find('#accept-amount').val()
+          
+              $.ajax({
+                url: 'http://127.0.0.1:1330/sub_bagian/verifikasi',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  id_ajukan: id,
+                  jumlah_diterima: jumlah_diterima
+                }),
+                success: function(response) {
+                  // Handle success
+                  $('#accModal').modal('hide')
+                  location.reload()
+                },
+                error: function(response) {
+                  // Handle error
+                  alert('An error occurred')
+                }
+              })
+            }
+          </script>
         {% block scripts %} {% endblock %}
     </body>
 </html>
+
+
+

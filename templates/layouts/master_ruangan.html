@@ -303,21 +303,24 @@
                       aria-label="Close"
                     ></button>
                   </div>
-                  <div class="modal-body">
+                  <div class="modal-body" >
+                    <form id="editFormPengajuan">
                     <div class="col mb-3">
-                      <label for="nameBasic" class="form-label">Nama Barang</label>
-                      <input type="text" id="nameBasic" class="form-control" placeholder="" />
+                      <label for="editName" class="form-label">Nama Barang</label>
+                      <input type="text" id="editName" class="form-control" name="name" placeholder="Nama Barang" required />
                     </div>
                     <div class="col mb-3">
-                      <label for="nameBasic" class="form-label">Jumlah Barang</label>
-                      <input type="text" id="nameBasic" class="form-control" placeholder="" />
+                      <label for="editQuantity" class="form-label">Jumlah Barang</label>
+                      <input type="number" id="editQuantity" class="form-control" name="quantity" placeholder="Jumlah Barang" required />
                     </div>
+                    <input type="hidden" id="editItemId" name="item_id" />
+                  </form>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" style="outline: #9CBEE4;" data-bs-dismiss="modal">
                       Close
                     </button>
-                    <button type="button" class="btn" style="background-color: #9CBEE4;color: white;">Save</button>
+                    <button type="submit" form="editFormPengajuan" class="btn btn-primary" style="background-color: #9CBEE4;color: white;">Save</button>
                   </div>
                 </div>
               </div>
@@ -348,12 +351,14 @@
                     <button type="button" class="btn btn-outline-secondary" style="outline: #9CBEE4;" data-bs-dismiss="modal">
                       Close
                     </button>
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-danger"id="confirmDelete">Delete</button>
                   </div>
                 </div>
               </div>
             </div>
             <!-- Modal Pengajuan -->
+
+
             <!-- Footer -->
             <footer class="content-footer footer bg-footer-theme">
               <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
@@ -400,11 +405,117 @@
 
     <!-- Page JS -->
     <script src="/static/assets/js/dashboards-analytics.js"></script>
+    <!-- <script -->
 
     
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+    <script>
+      $(document).ready(function() {
+    $('#pengusulan-barang').DataTable({
+        "paging": false,
+        "ordering": false,
+        "info": false
+    });
+});
+
+    </script>
+    <script>
+     
+     
+     document.addEventListener('DOMContentLoaded', function () {
+  // Variables for the modals and context
+  const deleteModal = document.getElementById('deleteModalPengajuan');
+  const editModal = document.getElementById('editPengajuanBarang');
+  let itemId, isPengusulan;
+
+  // Event listener for showing the delete modal
+  deleteModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    itemId = button.getAttribute('data-id');
+    isPengusulan = button.getAttribute('data-is-pengusulan') === 'true';
+  });
+
+  // Event listener for confirming deletion
+  document.getElementById('confirmDelete').addEventListener('click', function () {
+    const route = isPengusulan ? 'pengusulan_barang' : 'pengajuan_barang';
+    fetch(`/staff_ruangan/${route}/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Failed to delete item: ' + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while deleting the item');
+    });
+  });
+
+  // Event listener for showing the edit modal
+  editModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    itemId = button.getAttribute('data-id');
+    const itemName = button.getAttribute('data-name');
+    const itemQuantity = button.getAttribute('data-quantity');
+    isPengusulan = button.getAttribute('data-is-pengusulan') === 'true';
+
+    document.getElementById('editName').value = itemName;
+    document.getElementById('editQuantity').value = itemQuantity;
+    document.getElementById('editItemId').value = itemId;
+  });
+
+  // Event listener for submitting the edit form
+  document.getElementById('editFormPengajuan').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const itemId = document.getElementById('editItemId').value;
+    const itemName = document.getElementById('editName').value;
+    const itemQuantity = document.getElementById('editQuantity').value;
+    const route = isPengusulan ? 'pengusulan_barang' : 'pengajuan_barang';
+    const bodyData = {
+      nama_barang: itemName,
+    };
+
+    if (isPengusulan) {
+      bodyData.volume = itemQuantity;
+    } else {
+      bodyData.jumlah = itemQuantity;
+    }
+
+    fetch(`/staff_ruangan/${route}/${itemId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bodyData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Failed to update item: ' + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while updating the item');
+    });
+  });
+});
+
+      </script>
+      
+    
     {% block scripts %}
     {% endblock %}
   </body>

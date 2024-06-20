@@ -19,12 +19,12 @@
                     <tbody>
                         {% for product in data %}
                         <tr>
-                            <td>{{product["no"]}}</td>
-                            <td>{{product["tanggal"]}}</td>
-                            <td>{{product["ruangan"]}}</td>
+                            <td>{{product.no}}</td>
+                            <td>{{product.tanggal}}</td>
+                            <td>{{product.ruangan}}</td>
                             <td>
                                 <a
-                                    href="http://127.0.0.1:5000/kepala_bidang/verif/detail"
+                                href="{{ url_for('verifikasiDetailkepalaBidang', item_id=product.id) }}"
                                 >
                                     <span class="btn btn-primary rounded-pill"
                                         >Detail</span

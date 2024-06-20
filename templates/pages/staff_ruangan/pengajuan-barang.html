@@ -9,41 +9,47 @@
     <div class="col-xl">
       <div class="card mb-4">
         <div class="card-body">
-          <form>
+          <form id="pengajuanForm" action="/staff_ruangan/pengajuan" method="POST">
             <div class="mb-3">
-              <label class="form-label" for="basic-default-fullname">Tanggal</label>
-              <input type="text-input" class="form-control" id="basic-default-fullname"/>
+              <label class="form-label" for="tanggal">Tanggal</label>
+              <input type="date" class="form-control" id="tanggal" name="tanggal" value="YYYY-MM-DD" />
+              
+              <label class="form-label" for="ruangan">Ruangan</label>
+              <select class="form-select" id="ruangan" name="ruangan">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
             </div>
             <div class="row align-items-center">
               <div class="col">
                 <div class="mb-3">
-                  <label class="form-label" for="basic-default-company">Nama Barang</label>
-                  <select class="form-control" id="basic-default-company">
-                    <option value="Tisu">Tisu </option>
-                    <option value="HVS">HVS </option>
-                    <option value="Sabun ">Sabun </option>
-                    <option value="Hand Sanitizer ">Hand Sanitizer </option>
+                  <label class="form-label" for="nama_barang">Nama Barang</label>
+                  <select class="form-control" id="nama_barang" name="nama_barang">
+                    <option value="Tisu">Tisu</option>
+                    <option value="HVS">HVS</option>
+                    <option value="Sabun">Sabun</option>
+                    <option value="Hand Sanitizer">Hand Sanitizer</option>
                   </select>
                 </div>
               </div>
               <div class="col">
                 <div class="mb-3">
-                  <label class="form-label" for="basic-default-company">Jumlah</label>
-                  <input type="text" class="form-control" id="basic-default-company" />
+                  <label class="form-label" for="jumlah">Jumlah</label>
+                  <input type="text" class="form-control" id="jumlah" name="jumlah" />
                 </div>
               </div>
               <div class="col-1 mt-3 me-4">
                 <button type="submit" class="d-flex align-items-center btn text-white" style="background-color:#9CBEE4;">
-                  <i class="bx bx-plus"></i>
-                  Tambah</button>
+                  <i class="bx bx-plus"></i> Tambah
+                </button>
               </div>
             </div>
           </form>
         </div>
         <div class="card-body table-responsive text-nowrap">
-          <table id="pengajuan-barang"
-          class="display"
-          style="width: 100%">
+          <table id="pengajuan-barang" class="display" style="width: 100%">
             <thead>
               <tr>
                 <th>No</th>
@@ -54,34 +60,22 @@
               </tr>
             </thead>
             <tbody class="table-border-bottom-0">
-              <tr>
-                <td>1</td>
-                <td>Tisu</td>
-                <td class="text-center">5</td>
-                <td>Box</td>
+              {% for barang in pengajuan_barang %}
+              <tr data-id="{{ barang._id }}">
+                <td>{{ loop.index }}</td>
+                <td>{{ barang.nama_barang }}</td>
+                <td class="text-center">{{ barang.jumlah }}</td>
+                <td>BOX</td>
                 <td class="text-center">
-                  <button type="button" class="btn btn-warning rounded-pill" data-bs-toggle="modal" data-bs-target="#editPengajuanBarang">
+                  <button type="submit" class="btn btn-warning rounded-pill" data-bs-toggle="modal" data-bs-target="#editPengajuanBarang" data-id="{{ barang._id }}" data-name="{{ barang.nama_barang }}" data-quantity="{{ barang.jumlah }}" data-is-pengusulan="false">
                     <i class="bx bx-edit"></i>
                   </button>
-                  <button type="button" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModalPengajuan">
-                    <i class="bx bx-trash"></i>
-                  </button>
+                    <button type="submit" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModalPengajuan" data-id="{{ barang._id }}" data-is-pengusulan="false">
+                      <i class="bx bx-trash"></i>
+                    </button>
                 </td>
               </tr>
-              <tr>
-                <td>2</td>
-                <td>Kertas HVS</td>
-                <td class="text-center">10</td>
-                <td>Box</td>
-                <td class="text-center">
-                  <button type="button" class="btn btn-warning rounded-pill" data-bs-toggle="modal" data-bs-target="#editPengajuanBarang">
-                    <i class="bx bx-edit"></i>
-                  </button>
-                  <button type="button" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModalPengajuan">
-                    <i class="bx bx-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              {% endfor %}
             </tbody>
           </table>
           <div class="col float-end mt-4">
@@ -93,6 +87,7 @@
             </button>
           </div>
         </div>
+        
       </div>
     </div>
   </div>
@@ -102,6 +97,7 @@
     </div>
   </div> -->
 </div>
+
 
 <style>
 .container-xxl {
@@ -161,4 +157,38 @@ $(document).ready(function() {
         "info":     false
     } );
 } );</script>
+<script>
+  function deleteBarang(id) {
+          fetch(`/staff_ruangan/pengajuan_barang/${id}`, {
+              method: 'DELETE'
+          })
+          .then(response => {
+              if (response.ok) {
+                  location.reload(); 
+              } else {
+                  alert('Failed to delete item.');
+              }
+          })
+          .catch(error => console.error('Error:', error));
+  };
+
+  function addBarang() {
+        const form = document.getElementById('pengajuanForm');
+        const formData = new FormData(form);
+
+        fetch('/staff_ruangan/pengajuan_barang', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload(); 
+            } else {
+                alert('Failed to add item.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  
+</script>
 {% endblock %}

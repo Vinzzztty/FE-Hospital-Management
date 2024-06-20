@@ -1,7 +1,6 @@
 {% extends 'layouts/master_ruangan.html' %}
 
 {% block content %}
-
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row justify-content-center">
         <div class="col-12 card">
@@ -26,15 +25,16 @@
                             </div>
                         </div>
                     </div>
-                            <div class="mb-4 col-md-12">
-                                <div class="form-group row">
-                                    <label for="status" class="col-sm-2 col-form-label text-center">Jenis Transaksi</label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control" id="status">
-                                            <option value="proses">Pengajuan</option>
-                                            <option value="selesai">Pengusulan</option>
-                                        </select>
-                                    </div>
+                    <div class="mb-4 col-md-12">
+                        <div class="form-group row">
+                            <label for="status" class="col-sm-2 col-form-label text-center">Jenis Transaksi</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="status">
+                                    <option value="all">Semua</option>
+                                    <option value="Proses">Proses</option>
+                                    <option value="Selesai">Selesai</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -48,58 +48,21 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="transactionTableBody">
+                            {% for transaction in data %}
                             <tr>
-                                <td>1.</td>
-                                <td>23 Februari 2024</td>
+                                <td>{{ loop.index }}.</td>
+                                <td>{{ transaction.tanggal }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-success rounded-3">Selesai</button>
+                                    <button class="btn btn-sm {{ 'btn-success' if transaction.status == 'Selesai' else 'btn-warning' }} rounded-3" data-status="{{ transaction.status }}">
+                                        {{ transaction.status }}
+                                    </button>
                                 </td>
-                                
                                 <td>
-                                    <a href="{{ url_for('detail_transaksi') }}" class="btn btn-primary rounded-pill">Detail</a>
+                                    <a href="{{ url_for('detail_transaksi', transaction_id=transaction.no) }}" class="btn btn-primary rounded-pill">Detail</a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>2.</td>
-                                <td>20 Februari 2024</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success rounded-3">Selesai</button>
-                                </td>
-                                <td>
-                                    <a href="{{ url_for('detail_transaksi') }}" class="btn btn-primary rounded-pill">Detail</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3.</td>
-                                <td>28 Februari 2024</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success rounded-3">Selesai</button>
-                                </td>
-                                <td>
-                                    <a href="{{ url_for('detail_transaksi') }}" class="btn btn-primary rounded-pill">Detail</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4.</td>
-                                <td>1 Maret 2024</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success rounded-3">Selesai</button>
-                                </td>
-                                <td>
-                                    <a href="{{ url_for('detail_transaksi') }}" class="btn btn-primary rounded-pill">Detail</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5.</td>
-                                <td>20 Maret 2024</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success rounded-3">Selesai</button>
-                                </td>
-                                <td>
-                                    <a href="{{ url_for('detail_transaksi') }}" class="btn btn-primary rounded-pill">Detail</a>
-                                </td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -112,19 +75,40 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('#tblstatus').DataTable({
-            searching: false,
-            paging: true,
-            lengthChange: true,
-            pageLength: 10,
-            lengthMenu: [10, 25, 50, 100],
-            language: {
-                paginate: {
-                    previous: "Previous",
-                    next: "Next"
+        const tableBody = document.getElementById('transactionTableBody');
+        const tglStartInput = document.getElementById('tglstart');
+        const tglEndInput = document.getElementById('tglend');
+        const statusInput = document.getElementById('status');
+
+        function filterTransactions() {
+            const tglStart = new Date(tglStartInput.value);
+            const tglEnd = new Date(tglEndInput.value);
+            const status = statusInput.value;
+
+            for (const row of tableBody.rows) {
+                const tglText = row.cells[1].textContent;
+                const tgl = new Date(tglText.split(' ')[0]);
+                const rowStatus = row.cells[2].querySelector('button').getAttribute('data-status');
+
+                let showRow = true;
+
+                if (tglStart && tglStartInput.value && tgl < tglStart) {
+                    showRow = false;
                 }
+                if (tglEnd && tglEndInput.value && tgl > tglEnd) {
+                    showRow = false;
+                }
+                if (status !== 'all' && rowStatus !== status) {
+                    showRow = false;
+                }
+
+                row.style.display = showRow ? '' : 'none';
             }
-        });
+        }
+
+        tglStartInput.addEventListener('change', filterTransactions);
+        tglEndInput.addEventListener('change', filterTransactions);
+        statusInput.addEventListener('change', filterTransactions);
     });
 </script>
 {% endblock %}
