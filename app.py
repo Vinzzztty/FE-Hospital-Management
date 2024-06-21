@@ -18,6 +18,7 @@ from routes.sub_bagian import sub_bagian_bp
 from routes.kepala_bagian import kepala_bagian_bp
 from routes.verifikasi import verifikasi_bp
 from routes.transaksi import transaksi_bp
+from routes.staff_gudang import staff_gudang_bp
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key_here"
@@ -34,6 +35,7 @@ app.register_blueprint(sub_bagian_bp)
 app.register_blueprint(kepala_bagian_bp)
 app.register_blueprint(verifikasi_bp)
 app.register_blueprint(transaksi_bp)
+app.register_blueprint(staff_gudang_bp)
 
 import json
 import requests
