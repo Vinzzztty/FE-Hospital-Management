@@ -297,32 +297,40 @@ def dashboard_gudang():
 
 @app.route("/staff_gudang/verif")
 def verifikasi_pengajuan():
-    data = [
-        {
-            "no": 1,
-            "tanggal": "23/02/2023",
-            "ruangan": "Ruangan A",
-        },
-        {
-            "no": 2,
-            "tanggal": "25/02/2023",
-            "ruangan": "Ruangan B",
-        },
-        {
-            "no": 3,
-            "tanggal": "25/02/2023",
-            "ruangan": "Ruangan B",
-        },
-        {
-            "no": 4,
-            "tanggal": "25/02/2023",
-            "ruangan": "Ruangan B",
-        },
-    ]
+    if request.method == "POST":
+        if request.form.get("_method") == "DELETE":
+            return delete_pengusulan_barang(request.form.get("id"))
+
+    # Fetch data from the API
+    api_url = "http://127.0.0.1:5000/api/staff_gudang/ajukan"
+    response = requests.get(api_url)
+    data = response.json()
+
+    # Extract the sub_bag data
+    verif = data.get("staff_gudang", [])
+
+    # Process data if necessary (e.g., adding additional fields)
+    processed_data = []
+    for i, item in enumerate(verif):
+        processed_data.append(
+            {
+                "no": i + 1,
+                "tanggal": item["tanggal_pengajuan"],
+                "ruangan": item["ruangan"],  # Adjust this according to your data
+                "id": item["_id"],
+                "is_verif": item["is_verif"],
+                "jumlah_diterima": item["jumlah_diterima"],
+                "nama_barang": item["nama_barang"],
+                "tanggal_penerimaan": item["tanggal_penerimaan"],
+            }
+        )
+
+    print("DATA DATA SUB BAGIAN:>>>>>>>>>>>>>>>")
+    print(processed_data)
 
     return render_template(
         "/pages/staff_gudang/verifikasi_pengajuan.html",
-        data=data,
+        data=processed_data,
         menu="verifikasi_pengajuan",
     )
 
@@ -404,35 +412,35 @@ def transaksi():
     data = response.json()
 
     transactions = []
-    # Add the logic to process your JSON data into the transactions list
-    for transaksi in data.get("kepala_bagian_transaksi", []):
+    # Process pengajuan_barang
+    for transaksi in data.get("pengajuan_barang", []):
         transactions.append(
             {
                 "no": transaksi["_id"],
-                "tanggal": transaksi["tanggal_pengusulan"],
+                "tanggal": transaksi["tanggal_pengajuan"],
                 "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "nama_barang": transaksi["nama_barang"],
+                "jumlah": transaksi["jumlah"],
+                "jenis_transaksi": "pengajuan_barang",
             }
         )
-    for transaksi in data.get("sub_bag_transaksi", []):
+    # Process pengusulan
+    for transaksi in data.get("pengusulan", []):
         transactions.append(
             {
                 "no": transaksi["_id"],
                 "tanggal": transaksi["tanggal_pengusulan"],
                 "status": "Selesai" if transaksi["is_verif"] else "Proses",
-            }
-        )
-    for transaksi in data.get("verifikasi_transaksi", []):
-        transactions.append(
-            {
-                "no": transaksi["_id"],
-                "tanggal": transaksi["tanggal_pengusulan"],
-                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "nama_barang": transaksi["nama_barang"],
+                "jumlah": transaksi["jumlah_diterima"],
+                "jenis_transaksi": "pengusulan",
             }
         )
 
     return render_template(
         "/pages/staff_ruangan/transaksi.html", data=transactions, menu="transaksi"
     )
+
 
 
 @app.route("/staff_ruangan/transaksi/detail")

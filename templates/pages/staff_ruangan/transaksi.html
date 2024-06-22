@@ -27,12 +27,12 @@
                     </div>
                     <div class="mb-4 col-md-12">
                         <div class="form-group row">
-                            <label for="status" class="col-sm-2 col-form-label text-center">Jenis Transaksi</label>
+                            <label for="jenisTransaksi" class="col-sm-2 col-form-label text-center">Jenis Transaksi</label>
                             <div class="col-sm-8">
-                                <select class="form-control" id="status">
+                                <select class="form-control" id="jenisTransaksi">
                                     <option value="all">Semua</option>
-                                    <option value="Proses">Proses</option>
-                                    <option value="Selesai">Selesai</option>
+                                    <option value="pengajuan_barang">Pengajuan Barang</option>
+                                    <option value="pengusulan">Pengusulan Barang</option>
                                 </select>
                             </div>
                         </div>
@@ -45,22 +45,33 @@
                                 <th>No.</th>
                                 <th>Tanggal</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+            
                             </tr>
                         </thead>
                         <tbody id="transactionTableBody">
                             {% for transaction in data %}
-                            <tr>
+                            <tr data-jenis-transaksi="{{ transaction.jenis_transaksi }}">
                                 <td>{{ loop.index }}.</td>
                                 <td>{{ transaction.tanggal }}</td>
-                                <td>
-                                    <button class="btn btn-sm {{ 'btn-success' if transaction.status == 'Selesai' else 'btn-warning' }} rounded-3" data-status="{{ transaction.status }}">
-                                        {{ transaction.status }}
-                                    </button>
+                                <td class="text-center">
+                                    <button class="btn btn-sm 
+                                    {% if transaction.status == 'Selesai' %}
+                                        btn-success
+                                    {% elif transaction.status == 'Pending' %}
+                                        btn-warning
+                                    {% elif transaction.status == 'Proses' %}
+                                        btn-warning
+                                    {% elif transaction.status == 'Decline' %}
+                                        btn-danger
+                                    {% endif %}
+                                    rounded-3" data-status="{{ transaction.status }}">
+                                    {{ transaction.status }}
+                                </button>
                                 </td>
-                                <td>
-                                    <a href="{{ url_for('detail_transaksi', transaction_id=transaction.no) }}" class="btn btn-primary rounded-pill">Detail</a>
-                                </td>
+                                <td>{{ transaction.nama_barang }}</td>
+                                <td>{{ transaction.jumlah }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -78,17 +89,17 @@
         const tableBody = document.getElementById('transactionTableBody');
         const tglStartInput = document.getElementById('tglstart');
         const tglEndInput = document.getElementById('tglend');
-        const statusInput = document.getElementById('status');
+        const jenisTransaksiInput = document.getElementById('jenisTransaksi');
 
         function filterTransactions() {
             const tglStart = new Date(tglStartInput.value);
             const tglEnd = new Date(tglEndInput.value);
-            const status = statusInput.value;
+            const jenisTransaksi = jenisTransaksiInput.value;
 
             for (const row of tableBody.rows) {
                 const tglText = row.cells[1].textContent;
                 const tgl = new Date(tglText.split(' ')[0]);
-                const rowStatus = row.cells[2].querySelector('button').getAttribute('data-status');
+                const rowJenisTransaksi = row.getAttribute('data-jenis-transaksi');
 
                 let showRow = true;
 
@@ -98,7 +109,7 @@
                 if (tglEnd && tglEndInput.value && tgl > tglEnd) {
                     showRow = false;
                 }
-                if (status !== 'all' && rowStatus !== status) {
+                if (jenisTransaksi !== 'all' && rowJenisTransaksi !== jenisTransaksi) {
                     showRow = false;
                 }
 
@@ -108,7 +119,7 @@
 
         tglStartInput.addEventListener('change', filterTransactions);
         tglEndInput.addEventListener('change', filterTransactions);
-        statusInput.addEventListener('change', filterTransactions);
+        jenisTransaksiInput.addEventListener('change', filterTransactions);
     });
 </script>
 {% endblock %}
