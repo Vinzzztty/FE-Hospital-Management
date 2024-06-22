@@ -325,7 +325,7 @@ def verifikasi_pengajuan():
             }
         )
 
-    print("DATA DATA SUB BAGIAN:>>>>>>>>>>>>>>>")
+    print("DATA DATA STAFFGUDANG:>>>>>>>>>>>>>>>")
     print(processed_data)
 
     return render_template(
@@ -335,50 +335,54 @@ def verifikasi_pengajuan():
     )
 
 
-@app.route("/staff_gudang/verif/detail")
-def verifikasi_detail_pengajuan():
+@app.route("/staff_gudang/verif/detail/<item_id>")
+def verifikasi_detail_pengajuan(item_id):
+    api_url = f"http://127.0.0.1:5000/api/staff_gudang/ajukan/{item_id}"
+    response = requests.get(api_url)
+    item_detail = response.json()
+    print("DATA DATA STAFFGUDANG:>>>>>>>>>>>>>>>")
+    print(item_detail)
+
     return render_template(
         "/pages/staff_gudang/verifikasi-detail-pengajuan.html",
         menu="verifikasi_pengajuan",
+        item_detail=item_detail,
     )
 
 
 @app.route("/staff_gudang/transaksi")
 def transaksiGudang():
-    data = [
-        {
-            "no": 1,
-            "tanggal": "23 Februari 2024",
-            "status": "Selesai",
-            "ruangan": "Gudang A",
-        },
-        {
-            "no": 2,
-            "tanggal": "22 Februari 2024",
-            "status": "Proses",
-            "ruangan": "Gudang B",
-        },
-        {
-            "no": 3,
-            "tanggal": "24 Februari 2024",
-            "status": "Selesai",
-            "ruangan": "Gudang C",
-        },
-        {
-            "no": 4,
-            "tanggal": "27 Februari 2024",
-            "status": "Selesai",
-            "ruangan": "Gudang B",
-        },
-        {
-            "no": 5,
-            "tanggal": "25 Februari 2024",
-            "status": "Proses",
-            "ruangan": "Gudang D",
-        },
-    ]
+    api_url = "http://127.0.0.1:5000/api/transaksi"
+    response = requests.get(api_url)
+    data = response.json()
+
+    transactions = []
+    # Process pengajuan_barang
+    for transaksi in data.get("pengajuan_barang", []):
+        transactions.append(
+            {
+                "no": transaksi["_id"],
+                "tanggal": transaksi["tanggal_pengajuan"],
+                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "nama_barang": transaksi["nama_barang"],
+                "jumlah": transaksi["jumlah"],
+                "jenis_transaksi": "pengajuan_barang",
+            }
+        )
+    # Process pengusulan
+    for transaksi in data.get("pengusulan", []):
+        transactions.append(
+            {
+                "no": transaksi["_id"],
+                "tanggal": transaksi["tanggal_pengusulan"],
+                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "nama_barang": transaksi["nama_barang"],
+                "jumlah": transaksi["jumlah_diterima"],
+                "jenis_transaksi": "pengusulan",
+            }
+        )
     return render_template(
-        "/pages/staff_gudang/transaksi_gudang.html", data=data, menu="transaksi_gudang"
+        "/pages/staff_gudang/transaksi_gudang.html", data=transactions, menu="transaksi_gudang"
     )
 
 

@@ -9,21 +9,21 @@
     <div class="card mb-4">
       <div class="card-body">
         <div class="mb-3 row">
-          <label for="text-input" class="col-md-2 col-form-label">Ruang</label>
+          <label for="ruang-input" class="col-md-2 col-form-label">Ruang</label>
           <div class="col-md-10">
-            <input class="form-control" type="text" id="text-input"/>
+            <input class="form-control" type="text" id="ruang-input" value="{{item_detail.ruangan}}" readonly />
           </div>
         </div>
         <div class="mb-3 row">
-          <label for="text-input" class="col-md-2 col-form-label">Tanggal Pengajuan</label>
+          <label for="tanggal-pengajuan-input" class="col-md-2 col-form-label">Tanggal Pengajuan</label>
           <div class="col-md-10">
-            <input class="form-control" type="text" id="text-input" />
+            <input class="form-control" type="text" id="tanggal-pengajuan-input" value="{{ item_detail.tanggal_pengajuan }}" readonly />
           </div>
         </div>
         <div class="mb-3 row">
-          <label for="text-input" class="col-md-2 col-form-label">Tanggal Penerimaan</label>
+          <label for="tanggal-penerimaan-input" class="col-md-2 col-form-label">Tanggal Penerimaan</label>
           <div class="col-md-10">
-            <input class="form-control" type="text" id="text-input" />
+            <input class="form-control" type="text" id="tanggal-penerimaan-input" value="{{ item_detail.tanggal_penerimaan }}" readonly />
           </div>
         </div>
       </div>
@@ -37,8 +37,8 @@
             <tr>
               <th>No</th>
               <th>Nama Barang</th>
-              <th>Satuan</th>
               <th>Permintaan</th>
+              <th>Ruangan</th>
               <th>Status</th>
               <th>Keterangan</th>
             </tr>
@@ -46,9 +46,9 @@
           <tbody class="table-border-bottom-0">
             <tr>
               <td>1</td>
-              <td>Tisu</td>
-              <td>Pack</td>
-              <td>5</td>
+              <td>{{ item_detail.nama_barang }}</td>
+              <td>{{ item_detail.jumlah }}</td>
+              <td>{{ item_detail.ruangan }}</td>
               <td>
                 <button type="button" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#rejectModal">
                   ✖️
@@ -57,23 +57,9 @@
                   ✔️
                 </button>
               </td>
-              <td>Diterima (5)</td>
+              <td>{% if item_detail.is_verif %}Diterima{% else %}Belum Diverifikasi{% endif %} ({{ item_detail.jumlah_diterima }})</td>
             </tr>
-            <tr>
-              <td>2</td>
-              <td>Pengharum Ruangan</td>
-              <td>pack</td>
-              <td>2</td>
-              <td>
-                <button type="button" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                  ✖️
-                </button>
-                <button type="button" class="btn btn-success rounded-pill" data-bs-toggle="modal" data-bs-target="#accModal">
-                  ✔️
-                </button>
-              </td>
-              <td>Diterima (2) </td>
-            </tr>
+
           </tbody>
         </table>
       </div>
