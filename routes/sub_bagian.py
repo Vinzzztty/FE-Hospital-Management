@@ -29,18 +29,20 @@ def ajukan():
     volume = pengusulan_barang.get("volume")
     merek = pengusulan_barang.get("merek")
     ruangan = pengusulan_barang.get("ruangan")
+    status = "Process"
 
     sub_bag_id = mongo.db.sub_bag.insert_one(
         {
             "id_pengusulan_barang": id_pengusulan_barang,
             "tanggal_pengusulan": tanggal_pengusulan,
-            "tanggal_penerimaan": tanggal_penerimaan,
+            "tanggal_penerimaan": tanggal_pengusulan,
             "nama_barang": nama_barang,
             "volume": volume,
             "merek": merek,
             "ruangan": ruangan,
             "jumlah_diterima": 0,  # Default value
             "is_verif": False,  # Set is_verif to False by default
+            "status": status,
         }
     ).inserted_id
 
@@ -86,6 +88,8 @@ def verifikasi():
     data = request.get_json()
     ajukan_id = data.get("id_ajukan")
     jumlah_diterima = data.get("jumlah_diterima")
+    alasan = data.get("alasan")
+    status = data.get("status")
 
     if not ajukan_id or jumlah_diterima is None:
         return jsonify({"message": "Missing required fields"}), 400
@@ -96,7 +100,7 @@ def verifikasi():
 
     volume = int(ajukan["volume"])
 
-    if jumlah_diterima > volume:
+    if int(jumlah_diterima) > volume:
         return (
             jsonify({"message": "Jumlah diterima cannot be greater than volume"}),
             400,
@@ -106,13 +110,20 @@ def verifikasi():
 
     result = mongo.db.sub_bag.update_one(
         {"_id": ObjectId(ajukan_id)},
-        {"$set": {"jumlah_diterima": jumlah_diterima, "is_verif": is_verif}},
+        {
+            "$set": {
+                "jumlah_diterima": jumlah_diterima,
+                "is_verif": is_verif,
+                "status": status,
+                "alasan": alasan,
+            }
+        },
     )
 
     if result.modified_count == 1:
         return jsonify({"message": "Verification completed successfully"})
     else:
-        return jsonify({"message": "Verification failed"}), 500
+        return jsonify({"message": "Verification failed", "results": request.data}), 500
 
 
 @sub_bagian_bp.route("/verifikasi_true", methods=["GET"])

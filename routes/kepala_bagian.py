@@ -7,44 +7,46 @@ kepala_bagian_bp = Blueprint(
 )
 
 
-@kepala_bagian_bp.route("/ajukan", methods=["POST"])
-def ajukan():
-    data = request.get_json()
-    id_sub_bag = data.get("id_sub_bag")
-
-    if not id_sub_bag:
-        return jsonify({"message": "Missing required field id_sub_bag"}), 400
-
-    sub_bag = mongo.db.sub_bag.find_one({"_id": ObjectId(id_sub_bag), "is_verif": True})
-    if not sub_bag:
-        return jsonify({"message": "Invalid or unverified id_sub_bag"}), 400
-
-    ajukan_id = mongo.db.kepala_bagian.insert_one(
-        {
-            "id_sub_bag": id_sub_bag,
-            "tanggal_pengusulan": sub_bag["tanggal_penerimaan"],
-            "tanggal_penerimaan": None,
-            "nama_barang": sub_bag["nama_barang"],
-            "volume": sub_bag["volume"],
-            "merek": sub_bag["merek"],
-            "ruangan": sub_bag["ruangan"],
-            "jumlah_diterima": 0,
-            "is_verif": False,
-        }
-    ).inserted_id
-
-    new_ajukan = mongo.db.kepala_bagian.find_one({"_id": ajukan_id})
-    new_ajukan["_id"] = str(new_ajukan["_id"])
-
-    return jsonify(new_ajukan), 201
-
-
 @kepala_bagian_bp.route("/ajukan", methods=["GET"])
-def get_all_ajukan():
-    ajukan_items = list(mongo.db.kepala_bagian.find())
-    for item in ajukan_items:
+def ajukan():
+    # Retrieve all items that are verified
+    verified_items = list(mongo.db.sub_bag.find({"is_verif": True}))
+    for item in verified_items:
         item["_id"] = str(item["_id"])
-    return jsonify({"kepala_bagian": ajukan_items})
+
+    # Insert each verified item into the kepala_bagian collection
+    new_documents = []
+    for sub_bag in verified_items:
+        ajukan_id = mongo.db.kepala_bagian.insert_one(
+            {
+                "id_sub_bag": sub_bag["_id"],
+                "tanggal_pengusulan": sub_bag["tanggal_penerimaan"],
+                "tanggal_penerimaan": None,
+                "nama_barang": sub_bag["nama_barang"],
+                "volume": sub_bag["volume"],
+                "merek": sub_bag["merek"],
+                "ruangan": sub_bag["ruangan"],
+                "jumlah_diterima": 0,
+                "is_verif": False,
+                "status": "Process",
+            }
+        ).inserted_id
+
+        # Retrieve the newly inserted document
+        new_ajukan = mongo.db.kepala_bagian.find_one({"_id": ajukan_id})
+        new_ajukan["_id"] = str(new_ajukan["_id"])
+        new_documents.append(new_ajukan)
+
+    return jsonify({"kepala_bagian": new_documents}), 201
+
+
+# @kepala_bagian_bp.route("/ajukan", methods=["GET"])
+# def get_all_ajukan():
+
+#     ajukan_items = list(mongo.db.kepala_bagian.find())
+#     for item in ajukan_items:
+#         item["_id"] = str(item["_id"])
+#     return jsonify({"kepala_bagian": ajukan_items})
 
 
 @kepala_bagian_bp.route("/ajukan/<ajukan_id>", methods=["GET"])
@@ -62,6 +64,8 @@ def verifikasi():
     ajukan_id = data.get("id_ajukan")
     jumlah_diterima = data.get("jumlah_diterima")
     tanggal_penerimaan = data.get("tanggal_penerimaan")
+    alasan = data.get("alasan")
+    status = data.get("status")
 
     if not ajukan_id or jumlah_diterima is None or not tanggal_penerimaan:
         return jsonify({"message": "Missing required fields"}), 400
@@ -72,7 +76,7 @@ def verifikasi():
 
     volume = int(ajukan["volume"])
 
-    if jumlah_diterima > volume:
+    if int(jumlah_diterima) > volume:
         return (
             jsonify({"message": "Jumlah diterima cannot be greater than volume"}),
             400,
@@ -87,6 +91,8 @@ def verifikasi():
                 "jumlah_diterima": jumlah_diterima,
                 "is_verif": is_verif,
                 "tanggal_penerimaan": tanggal_penerimaan,
+                "status": status,
+                "alasan": alasan,
             }
         },
     )

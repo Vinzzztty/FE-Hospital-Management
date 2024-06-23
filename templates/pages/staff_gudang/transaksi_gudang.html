@@ -34,12 +34,12 @@
               <div class="form-group row">
                   <label for="jenisTransaksi" class="col-sm-2 col-form-label text-center">Jenis Transaksi</label>
                   <div class="col-sm-8">
-                      <select class="form-control" id="jenisTransaksi">
-                          <option value="all">Semua</option>
-                          <option value="pengajuan_barang">Pengajuan Barang</option>
-                          <option value="pengusulan">Pengusulan Barang</option>
-                      </select>
-                  </div>
+                    <select class="form-control" id="jenisTransaksi">
+                        <option value="all">Semua</option>
+                        <option value="pengajuan_barang" selected>Pengajuan Barang</option>
+                        <option value="pengusulan">Pengusulan Barang</option>
+                    </select>
+                </div>
               </div>
             <div class="top-buttons" style="margin-top: 60px;">
           <div class="text-start"></div>
@@ -70,19 +70,12 @@
                   <td class="text-center">{{ loop.index }}.</td>
                   <td class="text-center">{{ transaction.tanggal }}</td>
                   <td class="text-center">
-                      <button class="btn btn-sm 
-                      {% if transaction.status == 'Selesai' %}
-                          btn-success
-                      {% elif transaction.status == 'Pending' %}
-                          btn-warning
-                      {% elif transaction.status == 'Proses' %}
-                          btn-warning
-                      {% elif transaction.status == 'Decline' %}
-                          btn-danger
-                      {% endif %}
-                      rounded-3" data-status="{{ transaction.status }}">
-                      {{ transaction.status }}
-                  </button>
+                    <button
+                    class="btn btn-sm {% if transaction.status == 'Success' %} btn-success {% elif transaction.status == 'Pending' %} btn-warning {% elif transaction.status == 'Process' %} btn-warning {% elif transaction.status == 'Decline' %} btn-danger {% endif %} rounded-3"
+                    data-status="{{ transaction.status }}"
+                >
+                    {{ transaction.status }}
+                </button>
                   </td>
                   <td class="text-center">{{ transaction.nama_barang }}</td>
                   <td class="text-center">{{ transaction.jumlah }}</td>

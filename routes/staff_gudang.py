@@ -25,21 +25,22 @@ def ajukan():
 
     # Extract details from the referenced document
     tanggal_pengajuan = pengajuan_barang.get("tanggal_pengajuan")
-    tanggal_penerimaan = pengajuan_barang.get("tanggal_penerimaan")
     nama_barang = pengajuan_barang.get("nama_barang")
     jumlah = pengajuan_barang.get("jumlah")
     ruangan = pengajuan_barang.get("ruangan")
+    status = "Process"
 
     staff_gudang_id = mongo.db.staff_gudang.insert_one(
         {
             "id_pengajuan_barang": id_pengajuan_barang,
             "tanggal_pengajuan": tanggal_pengajuan,
-            "tanggal_penerimaan": tanggal_penerimaan,
+            "tanggal_penerimaan": None,
             "nama_barang": nama_barang,
             "jumlah": jumlah,
             "ruangan": ruangan,
             "jumlah_diterima": 0,  # Default value
             "is_verif": False,  # Set is_verif to False by default
+            "status": status,
         }
     ).inserted_id
 
@@ -83,6 +84,7 @@ def verifikasi():
     data = request.get_json()
     ajukan_id = data.get("id_ajukan")
     jumlah_diterima = data.get("jumlah_diterima")
+    tanggal_penerimaan = data.get("tanggal_penerimaan")
 
     if not ajukan_id or jumlah_diterima is None:
         return jsonify({"message": "Missing required fields"}), 400
@@ -103,7 +105,13 @@ def verifikasi():
 
     result = mongo.db.staff_gudang.update_one(
         {"_id": ObjectId(ajukan_id)},
-        {"$set": {"jumlah_diterima": jumlah_diterima, "is_verif": is_verif}},
+        {
+            "$set": {
+                "jumlah_diterima": jumlah_diterima,
+                "is_verif": is_verif,
+                "tanggal_penerimaan": tanggal_penerimaan,
+            }
+        },
     )
 
     if result.modified_count == 1:

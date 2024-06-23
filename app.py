@@ -156,11 +156,46 @@ def verifikasiDetailSubBag(item_id):
     response = requests.get(api_url)
     item_detail = response.json()
 
+    print("Ini adalah item detail")
+    print(item_detail)
+
     return render_template(
         "/pages/sub_bagian/verifikasi-detail-subBag.html",
         menu="verifikasi",
         item_detail=item_detail,
     )
+
+
+@app.route("/api/sub_bagian/verifikasi", methods=["POST"])
+def verifikasi():
+    try:
+        data = request.get_json()
+        print("DATA VERIFIKASIIIIIIIIII")
+        print(data)
+
+        # Extract fields from JSON data
+        id_ajukan = str(
+            data.get("id_ajukan")
+        )  # Ensure id_ajukan is treated as a string
+        reason = data.get("reason")
+        jumlah_diterima = data.get("jumlah_diterima")
+
+        # Validate if required fields are present
+        if not id_ajukan:
+            return jsonify({"message": "Missing 'id_ajukan' field"}), 400
+
+        # Process the data as needed
+        print(
+            f"Received data: id_ajukan={id_ajukan}, jumlah_diterima={jumlah_diterima}, reason={reason}"
+        )
+
+        # Here you can perform further processing based on your business logic
+
+        return jsonify({"message": "Verification successful", "results": data}), 200
+    except Exception as e:
+        # Log the exception for debugging purposes
+        print(str(e))
+        return jsonify({"message": "Verification failed", "error": str(e)}), 500
 
 
 ###################
@@ -363,7 +398,7 @@ def transaksiGudang():
             {
                 "no": transaksi["_id"],
                 "tanggal": transaksi["tanggal_pengajuan"],
-                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "status": transaksi["status"],
                 "nama_barang": transaksi["nama_barang"],
                 "jumlah": transaksi["jumlah"],
                 "jenis_transaksi": "pengajuan_barang",
@@ -375,14 +410,16 @@ def transaksiGudang():
             {
                 "no": transaksi["_id"],
                 "tanggal": transaksi["tanggal_pengusulan"],
-                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "status": transaksi["status"],
                 "nama_barang": transaksi["nama_barang"],
                 "jumlah": transaksi["jumlah_diterima"],
                 "jenis_transaksi": "pengusulan",
             }
         )
     return render_template(
-        "/pages/staff_gudang/transaksi_gudang.html", data=transactions, menu="transaksi_gudang"
+        "/pages/staff_gudang/transaksi_gudang.html",
+        data=transactions,
+        menu="transaksi_gudang",
     )
 
 
@@ -422,7 +459,7 @@ def transaksi():
             {
                 "no": transaksi["_id"],
                 "tanggal": transaksi["tanggal_pengajuan"],
-                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "status": transaksi["status"],
                 "nama_barang": transaksi["nama_barang"],
                 "jumlah": transaksi["jumlah"],
                 "jenis_transaksi": "pengajuan_barang",
@@ -434,7 +471,7 @@ def transaksi():
             {
                 "no": transaksi["_id"],
                 "tanggal": transaksi["tanggal_pengusulan"],
-                "status": "Selesai" if transaksi["is_verif"] else "Proses",
+                "status": transaksi["status"],
                 "nama_barang": transaksi["nama_barang"],
                 "jumlah": transaksi["jumlah_diterima"],
                 "jenis_transaksi": "pengusulan",
@@ -444,7 +481,6 @@ def transaksi():
     return render_template(
         "/pages/staff_ruangan/transaksi.html", data=transactions, menu="transaksi"
     )
-
 
 
 @app.route("/staff_ruangan/transaksi/detail")

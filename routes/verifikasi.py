@@ -5,38 +5,74 @@ from models import mongo
 verifikasi_bp = Blueprint("api/verifikasi", __name__, url_prefix="/api/verifikasi")
 
 
-@verifikasi_bp.route("/ajukan", methods=["POST"])
+# @verifikasi_bp.route("/ajukan", methods=["POST"])
+# def ajukan():
+#     data = request.get_json()
+#     id_kepala_bagian = data.get("id_kepala_bagian")
+
+#     if not id_kepala_bagian:
+#         return jsonify({"message": "Missing required field id_kepala_bagian"}), 400
+
+#     kepala_bagian = mongo.db.kepala_bagian.find_one(
+#         {"_id": ObjectId(id_kepala_bagian), "is_verif": True}
+#     )
+#     if not kepala_bagian:
+#         return jsonify({"message": "Invalid or unverified id_kepala_bagian"}), 400
+
+#     ajukan_id = mongo.db.verifikasi.insert_one(
+#         {
+#             "id_kepala_bagian": id_kepala_bagian,
+#             "tanggal_pengusulan": kepala_bagian["tanggal_penerimaan"],
+#             "tanggal_penerimaan": None,
+#             "nama_barang": kepala_bagian["nama_barang"],
+#             "volume": kepala_bagian["volume"],
+#             "merek": kepala_bagian["merek"],
+#             "ruangan": kepala_bagian["ruangan"],
+#             "jumlah_diterima": 0,
+#             "is_verif": False,
+#             "status": "Proses",
+#         }
+#     ).inserted_id
+
+#     new_ajukan = mongo.db.verifikasi.find_one({"_id": ajukan_id})
+#     new_ajukan["_id"] = str(new_ajukan["_id"])
+
+#     return jsonify(new_ajukan), 201
+
+
+@verifikasi_bp.route("/ajukan", methods=["GET"])
 def ajukan():
-    data = request.get_json()
-    id_kepala_bagian = data.get("id_kepala_bagian")
+    # Retrieve all items that are verified from kepala_bagian collection
+    verified_items = list(mongo.db.kepala_bagian.find({"is_verif": True}))
+    new_documents = []
 
-    if not id_kepala_bagian:
-        return jsonify({"message": "Missing required field id_kepala_bagian"}), 400
+    for sub_bag in verified_items:
+        # Insert each verified item into the verifikasi collection
+        ajukan_id = mongo.db.verifikasi.insert_one(
+            {
+                "id_kepala_bagian": str(
+                    sub_bag["_id"]
+                ),  # Store the _id of kepala_bagian
+                "tanggal_pengusulan": sub_bag["tanggal_penerimaan"],
+                "tanggal_penerimaan": None,
+                "nama_barang": sub_bag["nama_barang"],
+                "volume": sub_bag["volume"],
+                "merek": sub_bag["merek"],
+                "ruangan": sub_bag["ruangan"],
+                "jumlah_diterima": 0,
+                "is_verif": False,
+                "status": "Process",
+            }
+        ).inserted_id
 
-    kepala_bagian = mongo.db.kepala_bagian.find_one(
-        {"_id": ObjectId(id_kepala_bagian), "is_verif": True}
-    )
-    if not kepala_bagian:
-        return jsonify({"message": "Invalid or unverified id_kepala_bagian"}), 400
+        # Retrieve the newly inserted document from verifikasi collection
+        new_ajukan = mongo.db.verifikasi.find_one({"_id": ajukan_id})
+        new_ajukan["_id"] = str(
+            new_ajukan["_id"]
+        )  # Convert _id to string for JSON serialization
+        new_documents.append(new_ajukan)
 
-    ajukan_id = mongo.db.verifikasi.insert_one(
-        {
-            "id_kepala_bagian": id_kepala_bagian,
-            "tanggal_pengusulan": kepala_bagian["tanggal_penerimaan"],
-            "tanggal_penerimaan": None,
-            "nama_barang": kepala_bagian["nama_barang"],
-            "volume": kepala_bagian["volume"],
-            "merek": kepala_bagian["merek"],
-            "ruangan": kepala_bagian["ruangan"],
-            "jumlah_diterima": 0,
-            "is_verif": False,
-        }
-    ).inserted_id
-
-    new_ajukan = mongo.db.verifikasi.find_one({"_id": ajukan_id})
-    new_ajukan["_id"] = str(new_ajukan["_id"])
-
-    return jsonify(new_ajukan), 201
+    return jsonify({"verifikasi": new_documents}), 201
 
 
 @verifikasi_bp.route("/ajukan", methods=["GET"])
@@ -62,6 +98,8 @@ def verifikasi():
     ajukan_id = data.get("id_ajukan")
     jumlah_diterima = data.get("jumlah_diterima")
     tanggal_penerimaan = data.get("tanggal_penerimaan")
+    alasan = data.get("alasan")
+    status = data.get("status")
 
     if not ajukan_id or jumlah_diterima is None or not tanggal_penerimaan:
         return jsonify({"message": "Missing required fields"}), 400
@@ -70,9 +108,9 @@ def verifikasi():
     if not ajukan:
         return jsonify({"message": "Invalid id_ajukan"}), 400
 
-    volume = ajukan["volume"]
+    volume = int(ajukan["volume"])
 
-    if jumlah_diterima > volume:
+    if int(jumlah_diterima) > volume:
         return (
             jsonify({"message": "Jumlah diterima cannot be greater than volume"}),
             400,
@@ -87,6 +125,8 @@ def verifikasi():
                 "jumlah_diterima": jumlah_diterima,
                 "is_verif": is_verif,
                 "tanggal_penerimaan": tanggal_penerimaan,
+                "status": status,
+                "alasan": alasan,
             }
         },
     )

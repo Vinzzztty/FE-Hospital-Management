@@ -1,143 +1,231 @@
 {% extends 'layouts/master_ruangan.html' %} {% block content %}
 
 <div class="container-xxl flex-grow-1 container-p-y">
-  <div class="col-xl-12">
-    <!-- HTML5 Inputs -->
-    <div class="card-header">
-      <h2 class="text-uppercase">Form Pengusulan Barang</h2>
-    </div>
-    <div class="col-xl">
-      <div class="card mb-4">
-        <div class="card-body">
-          <form id="pengusulanForm" action="/staff_ruangan/pengusulan" method="POST">
-            <div class="mb-3">
-              <label class="form-label" for="tanggal">Tanggal</label>
-              <input type="date" class="form-control" id="tanggal" name="tanggal" value="YYYY-MM-DD" />
-            </div>
-            <label class="form-label" for="ruangan">Ruangan</label>
-            <select class="form-select" id="ruangan" name="ruangan">
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-            </select>
-            <div class="row align-items-center">
-              <div class="col">
-                <div class="mb-3">
-                  <label class="form-label" for="nama_barang">Nama Barang</label>
-                  <input type="text" class="form-control" id="nama_barang" name="nama_barang" />
-
-                </div>
-              </div>
-              <div class="col">
-                <div class="mb-3">
-                  <label class="form-label" for="jumlah">Jumlah</label>
-                  <input type="text" class="form-control" id="jumlah" name="jumlah" />
-                </div>
-              </div>
-              <div class="col">
-                <div class="mb-3">
-                  <label class="form-label" for="merek">Merek</label>
-                  <input type="text" class="form-control" id="merek" name="merek" />
-                </div>
-              </div>
-              <div class="col-1 mt-3 me-4">
-                <button type="submit" class="d-flex align-items-center btn text-white" style="background-color:#9CBEE4;">
-                  <i class="bx bx-plus"></i> Tambah
-                </button>
-              </div>
-            </div>
-          </form>
+    <div class="col-xl-12">
+        <!-- HTML5 Inputs -->
+        <div class="card-header">
+            <h2 class="text-uppercase">Form Pengusulan Barang</h2>
         </div>
-        <div class="card-body table-responsive text-nowrap">
-          <table id="pengusulan-barang"
-          class="display"
-          style="width: 100%">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Nama Barang</th>
-                <th class="text-center">Volume</th>
-                <th class="text-center">Type/Merk</th>
-                <th class="text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-              {% for barang in pengusulan_barang %}
-              <tr data-id="{{ barang._id }}">
-                <td>{{ loop.index }}</td>
-                <td>{{ barang.nama_barang }}</td>
-                <td class="text-center">{{ barang.volume}}</td>
-                <td class="text-center">{{ barang.merek }}</td>
-                <td class="text-center">
-                  <button type="button" class="btn btn-warning rounded-pill" data-bs-toggle="modal" data-bs-target="#editPengajuanBarang" data-id="{{ barang._id }}" data-name="{{ barang.nama_barang }}" data-quantity="{{ barang.volume }}"data-is-pengusulan="true">
-                    <i class="bx bx-edit"></i>
-                  </button>
-                  <button type="button" class="btn btn-danger rounded-pill" data-bs-toggle="modal" data-bs-target="#deleteModalPengajuan" data-id="{{ barang._id }}" data-is-pengusulan="true">
-                    <i class="bx bx-trash"></i>
-                  </button>
-                  </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          <div class="col float-end" style="margin-top: 150px;">
-            <button type="button" class="btn btn-danger rounded" data-bs-toggle="modal" >
-              Hapus
-            </button>
-            <button type="button" class="btn rounded text-white" data-bs-toggle="modal" style="background-color: #9CBEE4;">
-              Simpan
-            </button>
-          </div>
+        <div class="col-xl">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form
+                        id="pengusulanForm"
+                        action="/staff_ruangan/pengusulan"
+                        method="POST"
+                    >
+                        <div class="mb-3">
+                            <label class="form-label" for="tanggal"
+                                >Tanggal</label
+                            >
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="tanggal"
+                                name="tanggal"
+                                value="yyyy-MM-dd"
+                            />
+                        </div>
+                        <label class="form-label" for="ruangan">Ruangan</label>
+                        <select class="form-select" id="ruangan" name="ruangan">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                        </select>
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label class="form-label" for="nama_barang"
+                                        >Nama Barang</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="nama_barang"
+                                        name="nama_barang"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label class="form-label" for="jumlah"
+                                        >Jumlah</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="jumlah"
+                                        name="jumlah"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label class="form-label" for="merek"
+                                        >Merek</label
+                                    >
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="merek"
+                                        name="merek"
+                                    />
+                                </div>
+                            </div>
+                            <div class="col-1 mt-3 me-4">
+                                <button
+                                    type="submit"
+                                    class="d-flex align-items-center btn text-white"
+                                    style="background-color: #9cbee4"
+                                >
+                                    <i class="bx bx-plus"></i> Tambah
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body table-responsive text-nowrap">
+                    <table
+                        id="pengusulan-barang"
+                        class="display"
+                        style="width: 100%"
+                    >
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Barang</th>
+                                <th class="text-center">Volume</th>
+                                <th class="text-center">Type/Merk</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                            {% for barang in pengusulan_barang %}
+                            <tr data-id="{{ barang._id }}">
+                                <td>{{ loop.index }}</td>
+                                <td>{{ barang.nama_barang }}</td>
+                                <td class="text-center">{{ barang.volume}}</td>
+                                <td class="text-center">{{ barang.merek }}</td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning rounded-pill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editPengajuanBarang"
+                                        data-id="{{ barang._id }}"
+                                        data-name="{{ barang.nama_barang }}"
+                                        data-quantity="{{ barang.volume }}"
+                                        data-is-pengusulan="true"
+                                    >
+                                        <i class="bx bx-edit"></i>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger rounded-pill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModalPengajuan"
+                                        data-id="{{ barang._id }}"
+                                        data-is-pengusulan="true"
+                                    >
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary rounded-pill"
+                                        onclick="ajukanBarang('{{ barang._id }}')"
+                                    >
+                                        <i class="bx bx-send"></i> Ajukan
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="col float-end" style="margin-top: 150px">
+                        <button
+                            type="button"
+                            class="btn btn-danger rounded"
+                            data-bs-toggle="modal"
+                        >
+                            Hapus
+                        </button>
+                        <button
+                            type="button"
+                            class="btn rounded text-white"
+                            data-bs-toggle="modal"
+                            style="background-color: #9cbee4"
+                        >
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-$(document).ready(function() {
-    $('#pengajuan-barang').DataTable( {
-        "paging":   false,
-        "ordering": false,
-        "info":     false
-    } );
-} );</script>
-<script>
-function deleteBarang(id) {
-    fetch(`/staff_ruangan/pengusulan_barang/${id}`, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (response.ok) {
-            location.reload(); 
-        } else {
-            alert('Failed to delete item.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-};
+    $(document).ready(function () {
+        $("#pengajuan-barang").DataTable({
+            paging: false,
+            ordering: false,
+            info: false,
+        });
+    });
 
-function addBarang() {
-    const form = document.getElementById('pengusulanForm');
-    const formData = new FormData(form);
+    function deleteBarang(id) {
+        fetch(`/staff_ruangan/pengusulan_barang/${id}`, {
+            method: "DELETE",
+        })
+            .then((response) => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("Failed to delete item.");
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    }
 
-    fetch('/staff_ruangan/pengusulan_barang', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            location.reload(); 
-        } else {
-            alert('Failed to add item.');
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-  
+    function addBarang() {
+        const form = document.getElementById("pengusulanForm");
+        const formData = new FormData(form);
+
+        fetch("/staff_ruangan/pengusulan_barang", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("Failed to add item.");
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    }
+
+    function ajukanBarang(id) {
+        fetch("http://127.0.0.1:5000/api/sub_bagian/ajukan", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                id_pengusulan_barang: id,
+            }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    alert("Pengajuan berhasil!");
+                    location.reload();
+                } else {
+                    alert("Failed to submit request.");
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    }
 </script>
 {% endblock %}

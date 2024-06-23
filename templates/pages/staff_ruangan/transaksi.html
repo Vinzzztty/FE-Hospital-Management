@@ -1,6 +1,4 @@
-{% extends 'layouts/master_ruangan.html' %}
-
-{% block content %}
+{% extends 'layouts/master_ruangan.html' %} {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row justify-content-center">
         <div class="col-12 card">
@@ -11,35 +9,64 @@
                 <form class="row justify-content-center mb-2">
                     <div class="mb-4 col-md-6">
                         <div class="form-group row">
-                            <label for="tglstart" class="col-sm-3 col-form-label">Tanggal Mulai</label>
+                            <label
+                                for="tglstart"
+                                class="col-sm-3 col-form-label"
+                                >Tanggal Mulai</label
+                            >
                             <div class="col-sm-9">
-                                <input type="date" class="form-control" id="tglstart">
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="tglstart"
+                                />
                             </div>
                         </div>
                     </div>
                     <div class="mb-4 col-md-6">
                         <div class="form-group row">
-                            <label for="tglend" class="col-sm-3 col-form-label">Tanggal Selesai</label>
+                            <label for="tglend" class="col-sm-3 col-form-label"
+                                >Tanggal Selesai</label
+                            >
                             <div class="col-sm-9">
-                                <input type="date" class="form-control" id="tglend">
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="tglend"
+                                />
                             </div>
                         </div>
                     </div>
                     <div class="mb-4 col-md-12">
                         <div class="form-group row">
-                            <label for="jenisTransaksi" class="col-sm-2 col-form-label text-center">Jenis Transaksi</label>
+                            <label
+                                for="jenisTransaksi"
+                                class="col-sm-2 col-form-label text-center"
+                                >Jenis Transaksi</label
+                            >
                             <div class="col-sm-8">
-                                <select class="form-control" id="jenisTransaksi">
+                                <select
+                                    class="form-control"
+                                    id="jenisTransaksi"
+                                >
                                     <option value="all">Semua</option>
-                                    <option value="pengajuan_barang">Pengajuan Barang</option>
-                                    <option value="pengusulan">Pengusulan Barang</option>
+                                    <option value="pengajuan_barang">
+                                        Pengajuan Barang
+                                    </option>
+                                    <option value="pengusulan">
+                                        Pengusulan Barang
+                                    </option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </form>
                 <div class="table-responsive">
-                    <table class="table" id="tblstatus" style="overflow-x: auto !important; width: 100%;">
+                    <table
+                        class="table"
+                        id="tblstatus"
+                        style="overflow-x: auto !important; width: 100%"
+                    >
                         <thead class="text-center">
                             <tr>
                                 <th>No.</th>
@@ -47,28 +74,22 @@
                                 <th>Status</th>
                                 <th>Nama Barang</th>
                                 <th>Jumlah</th>
-            
                             </tr>
                         </thead>
                         <tbody id="transactionTableBody">
                             {% for transaction in data %}
-                            <tr data-jenis-transaksi="{{ transaction.jenis_transaksi }}">
+                            <tr
+                                data-jenis-transaksi="{{ transaction.jenis_transaksi }}"
+                            >
                                 <td>{{ loop.index }}.</td>
                                 <td>{{ transaction.tanggal }}</td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm 
-                                    {% if transaction.status == 'Selesai' %}
-                                        btn-success
-                                    {% elif transaction.status == 'Pending' %}
-                                        btn-warning
-                                    {% elif transaction.status == 'Proses' %}
-                                        btn-warning
-                                    {% elif transaction.status == 'Decline' %}
-                                        btn-danger
-                                    {% endif %}
-                                    rounded-3" data-status="{{ transaction.status }}">
-                                    {{ transaction.status }}
-                                </button>
+                                    <button
+                                        class="btn btn-sm {% if transaction.status == 'Success' %} btn-success {% elif transaction.status == 'Pending' %} btn-warning {% elif transaction.status == 'Process' %} btn-warning {% elif transaction.status == 'Decline' %} btn-danger {% endif %} rounded-3"
+                                        data-status="{{ transaction.status }}"
+                                    >
+                                        {{ transaction.status }}
+                                    </button>
                                 </td>
                                 <td>{{ transaction.nama_barang }}</td>
                                 <td>{{ transaction.jumlah }}</td>
@@ -81,15 +102,13 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tableBody = document.getElementById('transactionTableBody');
-        const tglStartInput = document.getElementById('tglstart');
-        const tglEndInput = document.getElementById('tglend');
-        const jenisTransaksiInput = document.getElementById('jenisTransaksi');
+    document.addEventListener("DOMContentLoaded", function () {
+        const tableBody = document.getElementById("transactionTableBody");
+        const tglStartInput = document.getElementById("tglstart");
+        const tglEndInput = document.getElementById("tglend");
+        const jenisTransaksiInput = document.getElementById("jenisTransaksi");
 
         function filterTransactions() {
             const tglStart = new Date(tglStartInput.value);
@@ -98,8 +117,10 @@
 
             for (const row of tableBody.rows) {
                 const tglText = row.cells[1].textContent;
-                const tgl = new Date(tglText.split(' ')[0]);
-                const rowJenisTransaksi = row.getAttribute('data-jenis-transaksi');
+                const tgl = new Date(tglText.split(" ")[0]);
+                const rowJenisTransaksi = row.getAttribute(
+                    "data-jenis-transaksi"
+                );
 
                 let showRow = true;
 
@@ -109,17 +130,20 @@
                 if (tglEnd && tglEndInput.value && tgl > tglEnd) {
                     showRow = false;
                 }
-                if (jenisTransaksi !== 'all' && rowJenisTransaksi !== jenisTransaksi) {
+                if (
+                    jenisTransaksi !== "all" &&
+                    rowJenisTransaksi !== jenisTransaksi
+                ) {
                     showRow = false;
                 }
 
-                row.style.display = showRow ? '' : 'none';
+                row.style.display = showRow ? "" : "none";
             }
         }
 
-        tglStartInput.addEventListener('change', filterTransactions);
-        tglEndInput.addEventListener('change', filterTransactions);
-        jenisTransaksiInput.addEventListener('change', filterTransactions);
+        tglStartInput.addEventListener("change", filterTransactions);
+        tglEndInput.addEventListener("change", filterTransactions);
+        jenisTransaksiInput.addEventListener("change", filterTransactions);
     });
 </script>
 {% endblock %}
