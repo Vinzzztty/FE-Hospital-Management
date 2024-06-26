@@ -9,12 +9,9 @@
   <div class="row d-flex">
     <div style="width: 260px" class="card mb-3 mx-2">
       <div class="row p-4">
-        <div
-          class="col-7 d-flex flex-column justify-content-center align-items-center">
-          <h1
-            style="color: #58c4dc; font-size: 5rem; line-height: 1"
-            class="fw-bold">
-            5
+        <div class="col-7 d-flex flex-column justify-content-center align-items-center">
+          <h1 id="totalPengajuan" style="color: #58c4dc; font-size: 5rem; line-height: 1" class="fw-bold">
+            0
           </h1>
           <p>Total Pengajuan</p>
         </div>
@@ -31,12 +28,9 @@
     </div>
     <div style="width: 260px" class="card mb-3 mx-2">
       <div class="row p-4">
-        <div
-          class="col-7 d-flex flex-column justify-content-center align-items-center">
-          <h1
-            style="color: #58c4dc; font-size: 5rem; line-height: 1"
-            class="fw-bold">
-            5
+        <div class="col-7 d-flex flex-column justify-content-center align-items-center">
+          <h1 id="totalPengusulan" style="color: #58c4dc; font-size: 5rem; line-height: 1" class="fw-bold">
+            0
           </h1>
           <p>Total Pengusulan</p>
         </div>
@@ -53,12 +47,9 @@
     </div>
     <div style="width: 260px" class="card mb-3 mx-2">
       <div class="row p-4">
-        <div
-          class="col-7 d-flex flex-column justify-content-center align-items-center">
-          <h1
-            style="color: #58c4dc; font-size: 5rem; line-height: 1"
-            class="fw-bold">
-            32
+        <div class="col-7 d-flex flex-column justify-content-center align-items-center">
+          <h1 id="totalStock" style="color: #58c4dc; font-size: 5rem; line-height: 1" class="fw-bold">
+            0
           </h1>
           <p>Total Stock</p>
         </div>
@@ -75,12 +66,9 @@
     </div>
     <div style="width: 260px" class="card mb-3 mx-2">
       <div class="row p-4">
-        <div
-          class="col-7 d-flex flex-column justify-content-center align-items-center">
-          <h1
-            style="color: #58c4dc; font-size: 5rem; line-height: 1"
-            class="fw-bold">
-            5
+        <div class="col-7 d-flex flex-column justify-content-center align-items-center">
+          <h1 id="totalTransaksi" style="color: #58c4dc; font-size: 5rem; line-height: 1" class="fw-bold">
+            0
           </h1>
           <p>Total Transaksi</p>
         </div>
@@ -96,47 +84,74 @@
       </div>
     </div>
   </div>
-
-    <h1 class="fw-bold">Status Pemesanan</h1>
-    <div class="table-responsive">
-        <table id="dashboard" class="display" style="width: 100%">
-            <thead class="tex-center">
-                <tr>
-                    <th>No.</th>
-                    <th>Tanggal Pengajuan / Pengusulan</th>
-                    <th>Jenis Layanan</th>
-                    <th>Status</th>
-                    <th>Tanggal Penerimaan</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1.</td>
-                    <td>23 Februari 2024</td>
-                    <td>Pengajuan</td>
-                    <td>
-                        <span class="btn btn-sm btn-success rounded-3">Success</span>
-                    </td>
-                    <td>25 Februari 2024 </td>
-                </tr>
-                <tr>
-                    <td>2.</td>
-                    <td>20 Februari 2024</td>
-                    <td>Pengusulan</td>
-                    <td>
-                        <span class="btn btn-sm btn-warning rounded-3">Proses</span>
-                    </td>
-                    <td>23 Februari 2024</td>
-                </tr>
-            </tbody>
-        </table>
-
-    </div>
+  
+  <h1 class="fw-bold">Status Pemesanan</h1>
+  <div class="table-responsive">
+      <table id="dashboard" class="display" style="width: 100%">
+          <thead class="tex-center">
+              <tr>
+                  <th>No.</th>
+                  <th>Tanggal Pengajuan / Pengusulan</th>
+                  <th>Jenis Layanan</th>
+                  <th>Status</th>
+                  <th>Tanggal Penerimaan</th>
+              </tr>
+          </thead>
+          <tbody>
+          </tbody>
+      </table>
   </div>
-  </class>
+  
 </section>
 {% endblock %} {% block scripts %}
 <script>
   $("#dashboard").DataTable();
+
+  fetch('http://127.0.0.1:5000/api/transaksi/dashboard')
+    .then(response => response.json())
+    .then(data => {
+        // Step 2: Calculate Totals
+        const totalPengajuan = data.pengajuan_barang.length;
+        const totalPengusulan = data.pengusulan.length;
+        const totalStock = data.pengajuan_barang.reduce((acc, item) => acc + parseInt(item.jumlah, 10), 0);
+        const totalTransaksi = totalPengajuan + totalPengusulan;
+
+        // Update the totals in the HTML
+        document.getElementById('totalPengajuan').innerText = totalPengajuan;
+        document.getElementById('totalPengusulan').innerText = totalPengusulan;
+        document.getElementById('totalStock').innerText = totalStock;
+        document.getElementById('totalTransaksi').innerText = totalTransaksi;
+
+        // Step 3: Populate the Table
+        const tableBody = document.querySelector('#dashboard tbody');
+        data.pengajuan_barang.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${item.tanggal_pengajuan}</td>
+                <td>Pengajuan</td>
+                <td><span class="btn btn-sm btn-${item.status.toLowerCase()} rounded-3">${item.status}</span></td>
+                <td>${item.tanggal_penerimaan || ''}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        data.pengusulan.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${totalPengajuan + index + 1}</td>
+                <td>${item.tanggal_pengusulan}</td>
+                <td>Pengusulan</td>
+                <td><span class="btn btn-sm btn-${item.status.toLowerCase()} rounded-3">${item.status}</span></td>
+                <td>${item.tanggal_penerimaan || ''}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Initialize DataTable
+        $('#dashboard').DataTable();
+    })
+    .catch(error => console.error('Error fetching data:', error));
+
 </script>
 {% endblock %}
