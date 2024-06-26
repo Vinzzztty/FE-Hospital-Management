@@ -94,7 +94,7 @@
                   <th>Tanggal Pengajuan / Pengusulan</th>
                   <th>Jenis Layanan</th>
                   <th>Status</th>
-                  <th>Tanggal Penerimaan</th>
+                  
               </tr>
           </thead>
           <tbody>
@@ -131,7 +131,7 @@
                 <td>${item.tanggal_pengajuan}</td>
                 <td>Pengajuan</td>
                 <td><span class="btn btn-sm btn-${item.status.toLowerCase()} rounded-3">${item.status}</span></td>
-                <td>${item.tanggal_penerimaan || ''}</td>
+               
             `;
             tableBody.appendChild(row);
         });
@@ -143,7 +143,7 @@
                 <td>${item.tanggal_pengusulan}</td>
                 <td>Pengusulan</td>
                 <td><span class="btn btn-sm btn-${item.status.toLowerCase()} rounded-3">${item.status}</span></td>
-                <td>${item.tanggal_penerimaan || ''}</td>
+               
             `;
             tableBody.appendChild(row);
         });
