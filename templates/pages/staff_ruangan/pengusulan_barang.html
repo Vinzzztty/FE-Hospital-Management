@@ -133,32 +133,16 @@
                                     <button
                                         type="button"
                                         class="btn btn-primary rounded-pill"
+                                        style="background-color: #9cbee4"
                                         onclick="ajukanBarang('{{ barang._id }}')"
                                     >
-                                        <i class="bx bx-send"></i> Ajukan
+                                        <i class="bx bx-send"></i> Usulkan
                                     </button>
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    <div class="col float-end" style="margin-top: 150px">
-                        <button
-                            type="button"
-                            class="btn btn-danger rounded"
-                            data-bs-toggle="modal"
-                        >
-                            Hapus
-                        </button>
-                        <button
-                            type="button"
-                            class="btn rounded text-white"
-                            data-bs-toggle="modal"
-                            style="background-color: #9cbee4"
-                        >
-                            Simpan
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -219,7 +203,7 @@
         })
             .then((response) => {
                 if (response.ok) {
-                    alert("Pengajuan berhasil!");
+                    alert("Pengusulan berhasil!");
                     location.reload();
                 } else {
                     alert("Failed to submit request.");

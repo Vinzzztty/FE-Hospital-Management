@@ -106,7 +106,7 @@
                                 <td>{{ loop.index }}</td>
                                 <td>{{ barang.nama_barang }}</td>
                                 <td class="text-center">{{ barang.jumlah }}</td>
-                                <td>BOX</td>
+                                <td>PACK</td>
                                 <td class="text-center">
                                     <button
                                         type="submit"
@@ -133,6 +133,7 @@
                                     <button
                                         type="button"
                                         class="btn btn-primary rounded-pill"
+                                        style="background-color: #9cbee4"
                                         onclick="usulkanBarang('{{ barang._id }}')"
                                     >
                                         <i class="bx bx-send"></i> Ajukan
@@ -142,23 +143,6 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <div class="col float-end mt-4">
-                        <button
-                            type="button"
-                            class="btn btn-danger rounded"
-                            data-bs-toggle="modal"
-                        >
-                            Hapus
-                        </button>
-                        <button
-                            type="button"
-                            class="btn rounded text-white"
-                            data-bs-toggle="modal"
-                            style="background-color: #9cbee4"
-                        >
-                            Ajukan
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

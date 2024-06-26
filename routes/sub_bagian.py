@@ -70,7 +70,7 @@ def get_all_ajukan():
 
 # GET route to retrieve a specific sub_bag item by ID
 @sub_bagian_bp.route("/ajukan/<ajukan_id>", methods=["GET"])
-def get_ajukan_detail(ajukan_id):
+def get_usulkan_detail(ajukan_id):
     sub_bag_item = mongo.db.sub_bag.find_one({"_id": ObjectId(ajukan_id)})
 
     if not sub_bag_item:

@@ -8,7 +8,7 @@ I will give you step by step to running this project
 
 ## Activate virtual-environment
 
-`.\venv\Scripts\Activate.ps1`
+`.\.venv\Scripts\activate`
 
 ## Install package and dependecies
 

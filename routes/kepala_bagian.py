@@ -40,14 +40,6 @@ def ajukan():
     return jsonify({"kepala_bagian": new_documents}), 201
 
 
-# @kepala_bagian_bp.route("/ajukan", methods=["GET"])
-# def get_all_ajukan():
-
-#     ajukan_items = list(mongo.db.kepala_bagian.find())
-#     for item in ajukan_items:
-#         item["_id"] = str(item["_id"])
-#     return jsonify({"kepala_bagian": ajukan_items})
-
 
 @kepala_bagian_bp.route("/ajukan/<ajukan_id>", methods=["GET"])
 def get_ajukan(ajukan_id):

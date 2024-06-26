@@ -43,7 +43,7 @@ def pengajuan_barang():
             ),
             400,
         )
-
+#menambahkan data pada pengajuan 
     pengajuan_id = mongo.db.pengajuan_barang.insert_one(
         {
             "role": role,
@@ -56,7 +56,7 @@ def pengajuan_barang():
     ).inserted_id
 
     new_pengajuan = mongo.db.pengajuan_barang.find_one({"_id": pengajuan_id})
-    new_pengajuan["_id"] = str(new_pengajuan["_id"])  # Convert ObjectId to string
+    new_pengajuan["_id"] = str(new_pengajuan["_id"])  
     return jsonify(new_pengajuan), 201
 
 
@@ -66,26 +66,26 @@ def update_pengajuan_barang(pengajuan_id):
     data = request.get_json()
     updated_fields = {}
 
-    # Check if nama_barang is provided and is valid
+    # Memeriksa nama barang
     if "nama_barang" in data and data["nama_barang"] in ALLOWED_BARANG:
         updated_fields["nama_barang"] = data["nama_barang"]
 
-    # Check if jumlah is provided
+    # memeriksa jumlah
     if "jumlah" in data:
         updated_fields["jumlah"] = data["jumlah"]
 
-    # Check if tanggal_penerimaan is provided
+    # memeriksa tanggal penerimaan
     if "tanggal_penerimaan" in data:
         updated_fields["tanggal_penerimaan"] = data["tanggal_penerimaan"]
 
-    # If no fields to update are provided
+    # memeriksa apakah ada field yang akan diperbarui
     if not updated_fields:
         return jsonify({"message": "No valid fields to update"}), 400
-
+#memperbarui dokumen dalam database
     result = mongo.db.pengajuan_barang.update_one(
         {"_id": ObjectId(pengajuan_id)}, {"$set": updated_fields}
     )
-
+#memeriksa hasil pembaruan
     if result.modified_count == 1:
         return jsonify({"message": "Pengajuan item updated successfully"})
     else:
@@ -115,7 +115,7 @@ def delete_all_pengajuan_barang():
         return jsonify({"message": "No pengajuan items found to delete"}), 404
 
 
-# GET route to retrieve all pengajuan items
+# GET route to retrieve all pengusulan items
 @staff_ruangan_bp.route("/pengusulan_barang", methods=["GET"])
 def get_pengusulan_barang():
     pengusulan_items = list(mongo.db.pengusulan_barang.find())
@@ -140,7 +140,7 @@ def pengusulan_barang():
 
     if not all([role, tanggal_pengusulan, nama_barang, volume, merek]):
         return jsonify({"message": "Missing required fields"}), 400
-
+#menambahkan data pada pengusulan barang
     pengusulan_id = mongo.db.pengusulan_barang.insert_one(
         {
             "role": role,
@@ -158,32 +158,31 @@ def pengusulan_barang():
     return jsonify(new_pengusulan), 201
 
 
-# PUT route to update a pengusulan item
 @staff_ruangan_bp.route("/pengusulan_barang/<pengusulan_id>", methods=["PUT"])
 def update_pengusulan_barang(pengusulan_id):
     data = request.get_json()
     updated_fields = {}
 
-    # Check if nama_barang is provided and is valid
+    # Mengecek dan menambahkan nama_barang 
     if "nama_barang" in data:
         updated_fields["nama_barang"] = data["nama_barang"]
 
-    # Check if volume is provided
+    # Mengecek dan menambahkan volume
     if "volume" in data:
         updated_fields["volume"] = data["volume"]
 
-    # Check if volume is provided
+     # Mengecek dan menambahkan tanggal_penerimaan 
     if "tanggal_penerimaan" in data:
         updated_fields["tanggal_penerimaan"] = data["tanggal_penerimaan"]
 
-    # If no fields to update are provided
+    # Jika tidak ada field yang valid untuk diupdate
     if not updated_fields:
         return jsonify({"message": "No valid fields to update"}), 400
-
+    # Melakukan update pada dokumen di MongoDB
     result = mongo.db.pengusulan_barang.update_one(
         {"_id": ObjectId(pengusulan_id)}, {"$set": updated_fields}
     )
-
+    # Mengecek apakah ada dokumen yang berhasil diupdate
     if result.modified_count == 1:
         return jsonify({"message": "Pengusulan item updated successfully"})
     else:
