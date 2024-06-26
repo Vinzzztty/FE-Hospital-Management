@@ -39,87 +39,7 @@ def create_transaksi():
         return jsonify({"error": str(e)}), 400
 
 
-# @transaksi_bp.route("/", methods=["GET"])
-# def get_all_transaksi():
-#     all_transaksi = {
-#         "pengusulan": [],
-#         "pengajuan_barang": [],
-#     }
-
-#     try:
-#         # Fetch data from MongoDB collections for each role
-#         sub_bag_transaksi = list(mongo.db.sub_bag.find())
-#         kepala_bagian_transaksi = list(mongo.db.kepala_bagian.find())
-#         verifikasi_transaksi = list(mongo.db.verifikasi.find())
-#         pengajuan_barang = list(mongo.db.pengajuan_barang.find())
-
-#         # Add status to each transaction and append to pengusulan
-#         for item in sub_bag_transaksi:
-#             item["_id"] = str(item["_id"])
-#             item["status"] = (
-#                 "On Process" if not item.get("is_verif", False) else "Pending"
-#             )
-#             item["role"] = "Sub Bagian"
-#             all_transaksi["pengusulan"].append(item)
-
-#         for item in kepala_bagian_transaksi:
-#             item["_id"] = str(item["_id"])
-#             item["status"] = "Decline" if not item.get("is_verif", False) else "Pending"
-#             item["role"] = "Kepala Bagian"
-#             all_transaksi["pengusulan"].append(item)
-
-#         for item in verifikasi_transaksi:
-#             item["_id"] = str(item["_id"])
-#             item["status"] = "Success" if item.get("is_verif", False) else "Decline"
-#             item["role"] = "Verifikasi"
-#             all_transaksi["pengusulan"].append(item)
-
-#         # Convert ObjectId to string for JSON serialization
-#         for item in pengajuan_barang:
-#             item["_id"] = str(item["_id"])
-#             if item.get("is_verif", False):
-#                 item["status"] = "Success"
-#             else:
-#                 item["status"] = "Decline"
-#             item["role"] = "Staff Ruangan"
-#             all_transaksi["pengajuan_barang"].append(item)
-
-#         return jsonify(all_transaksi), 200
-
-#     except PyMongoError as e:
-#         error_message = f"MongoDB error: {str(e)}"
-#         return jsonify({"error": error_message}), 500
-
-
-# @transaksi_bp.route("/", methods=["GET"])
-# def get_all_transaksi():
-#     all_transaksi = {
-#         "pengusulan": [],
-#         "pengajuan_barang": [],
-#     }
-
-#     try:
-#         # Fetch data from MongoDB collection
-#         verifikasi_transaksi = list(mongo.db.verifikasi.find())
-
-#         for item in verifikasi_transaksi:
-#             item["_id"] = str(item["_id"])
-#             if item.get("is_verif", False):
-#                 item["status"] = "Success"
-#             else:
-#                 item["status"] = "Decline"
-#             item["role"] = "Verifikasi"
-#             all_transaksi["pengusulan"].append(item)
-
-#         return jsonify(all_transaksi), 200
-
-#     except PyMongoError as e:
-#         error_message = f"MongoDB error: {str(e)}"
-#         return jsonify({"error": error_message}), 500
-
-
-@transaksi_bp.route("/", methods=["GET"])
-def get_all_transaksi():
+def fetch_transaksi_data():
     all_transaksi = {
         "pengusulan": [],
         "pengajuan_barang": [],
@@ -180,11 +100,39 @@ def get_all_transaksi():
             item["role"] = "Staff Ruangan"
             all_transaksi["pengajuan_barang"].append(item)
 
-        return jsonify(all_transaksi), 200
+        return all_transaksi
 
     except PyMongoError as e:
         error_message = f"MongoDB error: {str(e)}"
-        return jsonify({"error": error_message}), 500
+        return {"error": error_message}
+
+
+@transaksi_bp.route("/", methods=["GET"])
+def get_all_transaksi():
+    data = fetch_transaksi_data()
+    if "error" in data:
+        return jsonify(data), 500
+    return jsonify(data), 200
+
+
+@transaksi_bp.route("/dashboard", methods=["GET"])
+def get_dashboard():
+    data = fetch_transaksi_data()
+    if "error" in data:
+        return jsonify(data), 500
+
+    total_pengusulan = len(data["pengusulan"])
+    total_pengajuan = len(data["pengajuan_barang"])
+    total_transaksi = total_pengusulan + total_pengajuan
+
+    dashboard_data = {
+        "total_transaksi": total_transaksi,
+        "total_pengusulan": total_pengusulan,
+        "total_pengajuan": total_pengajuan,
+        **data,
+    }
+
+    return jsonify(dashboard_data), 200
 
 
 @transaksi_bp.route("/<string:transaksi_id>", methods=["GET"])
