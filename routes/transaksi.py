@@ -107,6 +107,79 @@ def fetch_transaksi_data():
         return {"error": error_message}
 
 
+def fetch_transaksi_data_by_status(status="Process"):
+    all_transaksi = {
+        "pengusulan": [],
+        "pengajuan_barang": [],
+    }
+
+    try:
+        # Fetch data from MongoDB collections for each role
+        sub_bag_transaksi = list(mongo.db.sub_bag.find({"status": status}))
+        kepala_bagian_transaksi = list(mongo.db.kepala_bagian.find({"status": status}))
+        verifikasi_transaksi = list(mongo.db.verifikasi.find({"status": status}))
+        staff_gudang = list(mongo.db.staff_gudang.find({"status": status}))
+
+        # Create sets to track IDs for deletion
+        delete_ids = set()
+
+        # Process verifikasi_transaksi first to identify deletions
+        for item in verifikasi_transaksi:
+            item["_id"] = str(item["_id"])
+            item["role"] = "Verifikasi"
+
+            if item["status"] == "Process":
+                delete_ids.add(item["_id"])
+            elif item.get("is_verif", False):
+                item["status"] = item["status"]
+            elif item["status"] == "Success":
+                item["status"] = "Success"
+            elif item["status"] == "Decline":
+                continue  # Skip items with status "Decline"
+            else:
+                item["status"] = "Unknown"
+                all_transaksi["pengusulan"].append(item)
+
+        # Process kepala_bagian_transaksi
+        kepala_bagian_to_add = []
+        for item in kepala_bagian_transaksi:
+            item["_id"] = str(item["_id"])
+            item["role"] = "Kepala Bagian"
+            if item["status"] == "Process" and not item.get("is_verif", False):
+                delete_ids.add(item["_id"])
+            elif item["_id"] not in delete_ids and item["status"] != "Decline":
+                kepala_bagian_to_add.append(item)
+
+        # Process sub_bag_transaksi
+        sub_bag_to_add = []
+        for item in sub_bag_transaksi:
+            item["_id"] = str(item["_id"])
+            item["role"] = "Sub Bagian"
+            if (
+                not item.get("is_verif", False)
+                and item["_id"] not in delete_ids
+                and item["status"] != "Decline"
+            ):
+                sub_bag_to_add.append(item)
+
+        # Add the filtered kepala_bagian and sub_bag transactions
+        all_transaksi["pengusulan"].extend(kepala_bagian_to_add)
+        all_transaksi["pengusulan"].extend(sub_bag_to_add)
+
+        # Process and add status to pengajuan_barang
+        for item in staff_gudang:
+            item["_id"] = str(item["_id"])
+            item["role"] = "Staff Ruangan"
+            if item["status"] != "Decline":
+                all_transaksi["pengajuan_barang"].append(item)
+
+        return all_transaksi
+
+    except PyMongoError as e:
+        error_message = f"MongoDB error: {str(e)}"
+        return {"error": error_message}
+
+
 @transaksi_bp.route("/", methods=["GET"])
 def get_all_transaksi():
     data = fetch_transaksi_data()
@@ -117,7 +190,7 @@ def get_all_transaksi():
 
 @transaksi_bp.route("/dashboard", methods=["GET"])
 def get_dashboard():
-    data = fetch_transaksi_data()
+    data = fetch_transaksi_data_by_status(status="Process")
     if "error" in data:
         return jsonify(data), 500
 
